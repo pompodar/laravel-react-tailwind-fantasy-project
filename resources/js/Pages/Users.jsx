@@ -9,6 +9,10 @@ export default function Welcome({ users }) {
     const [sortOrder, setSortOrder] = useState('asc');
     const { auth } = usePage().props;
 
+    // Pagination state
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 1; // Set the number of users to display per page
+
     const [usersList, setUsersList] = useState(users); // Initialize with the initial list of users
 
     function deleteUser(userId) {
@@ -29,6 +33,26 @@ export default function Welcome({ users }) {
                 });
         }
     }
+
+    // Calculate Pagination Parameters
+    const indexOfLastUser = currentPage * usersPerPage;
+    const indexOfFirstUser = indexOfLastUser - usersPerPage;
+    const currentUsers = usersList.slice(indexOfFirstUser, indexOfLastUser);
+
+    // Handle Pagination Controls
+    const totalPages = Math.ceil(usersList.length / usersPerPage);
+
+    const nextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const prevPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -61,10 +85,10 @@ export default function Welcome({ users }) {
                         </div>
                     </div>
                 </div>
-                {usersList.length === 0 ? (
+                {currentUsers.length === 0 ? (
                     <p>No users found with the given search term.</p>
                 ) : (
-                    usersList
+                    currentUsers
                         .filter((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
                         .sort((a, b) => {
                             if (sortCriterion === 'name') {
@@ -86,11 +110,11 @@ export default function Welcome({ users }) {
                                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                                     <div className="flex bg-white overflow-hidden shadow-sm sm:rounded-lg">
                                         <div className="text-left w-40 p-6 text-gray-900">
-                                            {user.name} {auth.user.id == user.id ? " (me)" : null}
+                                            {user.name} {auth.user.id === user.id ? " (me)" : null}
                                         </div>
-                                        <div className="text-left w-36 p-6 text-gray-900">{user.admin == 1 ? "admin" : "subscriber"}</div>
+                                        <div className="text-left w-36 p-6 text-gray-900">{user.admin === 1 ? "admin" : "subscriber"}</div>
                                         <div className="text-left w-56 p-6 text-gray-900">{user.email}</div>
-                                        {user.id !== auth.user.id && 
+                                        {user.id !== auth.user.id &&
                                             <div
                                                 className="text-left w-40 p-6 text-gray-900 ml-auto cursor-pointer"
                                                 onClick={() => deleteUser(user.id)}
@@ -103,6 +127,11 @@ export default function Welcome({ users }) {
                             </div>
                         ))
                 )}
+
+                <div className="ml-8 mt-2 w-40 flex justify-between items-center">
+                    <button onClick={prevPage} disabled={currentPage === 1}>previous</button>
+                    <button onClick={nextPage} disabled={currentPage === totalPages}>next</button>
+                </div>
             </div>
         </AuthenticatedLayout>
     );
