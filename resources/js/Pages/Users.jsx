@@ -53,6 +53,7 @@ export default function Welcome({ users }) {
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                         <div className="flex bg-white overflow-hidden shadow-sm sm:rounded-lg">
                             <button className="text-left w-40 px-6 p-2 text-gray-900" onClick={() => setSortCriterion('name')}>sort by name</button>
+                            <button className="text-left w-36 px-6 p-2 text-gray-900" onClick={() => setSortCriterion('role')}>sort by role</button>
                             <button className="text-left w-48 px-6 p-2 text-gray-900" onClick={() => setSortCriterion('email')}>sort by email</button>
                             <button className="text-left w-40 px-6 p-2 text-gray-900 ml-auto" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}>
                                 {sortOrder === 'asc' ? 'ascending' : 'descending'}
@@ -70,7 +71,14 @@ export default function Welcome({ users }) {
                                 return sortOrder === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
                             } else if (sortCriterion === 'email') {
                                 return sortOrder === 'asc' ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email);
+                            } else if (sortCriterion === 'role') {
+                                if (sortOrder === 'asc') {
+                                    return a.admin - b.admin; // Ascending order
+                                } else {
+                                    return b.admin - a.admin; // Descending order
+                                }
                             }
+
                             return 0; // No sorting
                         })
                         .map((user) => (
@@ -80,13 +88,16 @@ export default function Welcome({ users }) {
                                         <div className="text-left w-40 p-6 text-gray-900">
                                             {user.name} {auth.user.id == user.id ? " (me)" : null}
                                         </div>
+                                        <div className="text-left w-36 p-6 text-gray-900">{user.admin == 1 ? "admin" : "subscriber"}</div>
                                         <div className="text-left w-56 p-6 text-gray-900">{user.email}</div>
-                                        <div
-                                            className="text-left w-40 p-6 text-gray-900 ml-auto cursor-pointer"
-                                            onClick={() => deleteUser(user.id)}
-                                        >
-                                            delete
-                                        </div>
+                                        {user.id !== auth.user.id && 
+                                            <div
+                                                className="text-left w-40 p-6 text-gray-900 ml-auto cursor-pointer"
+                                                onClick={() => deleteUser(user.id)}
+                                            >
+                                                delete
+                                            </div>
+                                        }
                                     </div>
                                 </div>
                             </div>
