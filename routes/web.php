@@ -26,9 +26,13 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified', 'admin'])->name('dashboard');
+Route::prefix('/dashboard')->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
+    
+    Route::get('/users', [UserController::class, 'index'])->middleware(['auth', 'verified', 'admin'])->name('users');
+})->middleware(['auth', 'verified']);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -37,10 +41,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-
-Route::prefix('/users')->group(function() {
-    Route::get('/', [UserController::class, 'index'])->name('users');
-    // ...
-});
 
 Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);

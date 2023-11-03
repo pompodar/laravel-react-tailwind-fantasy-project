@@ -15,7 +15,12 @@ class UserController extends Controller
         return Inertia::render('Users', compact('users'));
     }
 
-    // app/Http/Controllers/UserController.php
+    public function getUsers()
+    {
+        $users = User::all();
+
+        return $users;
+    }
 
     public function deleteUser($userId)
     {

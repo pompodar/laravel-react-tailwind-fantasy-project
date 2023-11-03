@@ -19,4 +19,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::delete('/api/users/{userId}', [UserController::class, 'deleteUser']);
+Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
+
+Route::get('/users/', [UserController::class, 'getUsers']);
+
+Route::post('messages', [\App\Http\Controllers\ChatController::class, 'message']);
+
+Route::get('/get-messages/', [\App\Http\Controllers\ChatController::class, 'index']);

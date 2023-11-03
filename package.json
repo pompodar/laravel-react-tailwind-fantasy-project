@@ -21,6 +21,8 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "preline": "^1.9.0",
+        "pusher-js": "^8.3.0",
         "react-router-dom": "^6.17.0"
     }
 }
