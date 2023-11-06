@@ -5,6 +5,8 @@ use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Repositories\Contracts\SearchRepository;
+use App\Http\Controllers\SearchController;
 
 /*
 |--------------------------------------------------------------------------
@@ -43,3 +45,11 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
+
+Route::get('/articles', function (SearchRepository $searchRepository) {
+     return Inertia::render('Articles', [
+         'articles' => request()->has('q')
+             ? $searchRepository->search(request('q'))
+             : App\Models\Article::all(),
+     ]);
+ })->name('articles'); 

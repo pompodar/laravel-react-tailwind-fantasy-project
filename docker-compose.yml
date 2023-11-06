@@ -27,6 +27,7 @@ services:
             - meilisearch
             - mailpit
             - selenium
+            - elasticsearch
     mysql:
         image: 'mysql/mysql-server:8.0'
         ports:
@@ -100,6 +101,17 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+    elasticsearch:
+         image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
+         environment:
+             - discovery.type=single-node
+         ports:
+             - 9200:9200
+             - 9300:9300
+         volumes:
+             - sailelasticsearch:/usr/share/elasticsearch/data
+         networks:
+             - sail         
 networks:
     sail:
         driver: bridge
@@ -110,3 +122,5 @@ volumes:
         driver: local
     sail-meilisearch:
         driver: local
+    sailelasticsearch:
+         driver: local    
