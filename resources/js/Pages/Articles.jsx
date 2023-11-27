@@ -1,11 +1,11 @@
-// resources/js/Pages/Search.js
 import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react'
 
-const Search = (props) => {
+const Articles = (props) => {
     const { query, articles } = props;
     const [searchQuery, setSearchQuery] = useState(query);
     const [results, setResults] = useState([]);
+
 
     useEffect(() => {
         if (query) {
@@ -76,9 +76,9 @@ const Search = (props) => {
                     results.map((result) => (
                         <article key={result.id}>
                             <h2>{result.title}</h2>
-                            <p>{result.body}</p>
+                            <div dangerouslySetInnerHTML={{ __html: result.body }} />
                             <div>
-                                {result.tags.map((tag) => (
+                                {result.tags && result.tags.map((tag) => (
                                     <span
                                         key={tag}
                                         className="text-xs px-2 py-1 rounded bg-indigo-50 text-indigo-500"
@@ -97,4 +97,4 @@ const Search = (props) => {
     );
 };
 
-export default Search;
+export default Articles;

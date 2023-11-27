@@ -11,6 +11,13 @@ class Article extends Model
     use HasFactory;
     use Searchable;
 
+    protected $fillable = [
+        'user_id',
+        'title',
+        'body',
+        'tags',
+    ];
+
     protected $casts = [
         'tags' => 'json',
     ];
