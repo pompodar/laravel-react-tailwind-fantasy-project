@@ -1,40 +1,16 @@
 // src/components/ArticleForm.js
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 
-const AddArticle = () => {
-    const [content, setContent] = useState('');
-    const [categories, setCategories] = useState([]);
+const AddCategory = (props) => {
+    const { categories } = props;
     const [selectedCategory, setSelectedCategory] = useState('');
+
 
     const [title, setTitle] = useState('');
 
-    const [tags, setTags] = useState([]);
-
-    useEffect(() => {
-        fetchCategories();
-    }, [])
-
-    const fetchCategories = async () => {
-        try {
-            const response = await axios.get('/api/categories');
-            setCategories(response.data.categories);
-        } catch (error) {
-            console.error('Error fetching categories:', error);
-        }
-    };
-
     const handleTitleChange = (e) => {
         setTitle(e.target.value);
-    };
-
-    const handleTagsChange = (e) => {
-        const tagInput = e.target.value;
-        // Split the input into an array of tags
-        const tagArray = tagInput.split(',').map(tag => tag.trim());
-        setTags(tagArray);
     };
 
     const handleSelectChange = (event) => {
@@ -44,14 +20,13 @@ const AddArticle = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(tags);
-
         try {
-            await axios.post('/api/articles/create', { title: title, content: content, tags: tags, selectedCategory: selectedCategory });
+            alert(title);
+            await axios.post('/api/categories/create', { name: title, paren_id: selectedCategory });
             // Handle success (redirect, display a message, etc.)
         } catch (error) {
             // Handle error
-            console.error('Error creating article:', error);
+            console.error('Error creating category:', error);
         }
     };
 
@@ -63,16 +38,6 @@ const AddArticle = () => {
                 name="title"
                 value={title}
                 onChange={handleTitleChange}
-            />
-
-            <label>Content:</label>
-            <ReactQuill name="content" theme="snow" value={content} onChange={setContent} />
-
-            <input
-                type="text"
-                name="tags"
-                value={tags.join(', ')} // Display tags as a comma-separated string
-                onChange={handleTagsChange}
             />
 
             <div>
@@ -99,9 +64,9 @@ const AddArticle = () => {
                 )}
             </div>
 
-            <button type="submit">Add Article</button>
+            <button type="submit">Add Category</button>
         </form>
     );
 };
 
-export default AddArticle;
+export default AddCategory;

@@ -32,6 +32,54 @@ class ArticleController extends Controller
             'tags' => $request->input('tags'),
         ]);
 
+        $category_id = $request->input('selectedCategory');
+
+        $article->categories()->syncWithoutDetaching($category_id);
+
         return response()->json(['article' => $article], 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validate the request data
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'body' => 'required|string',
+            'tags' => 'array',
+            'category_ids' => 'array',
+        ]);
+
+        // Find the article by ID
+        $article = Article::findOrFail($id);
+
+        // Update the article with the validated data
+        $article->update([
+            'title' => $request->input('title'),
+            'body' => $request->input('body'),
+            'tags' => $request->input('tags', []), // Assuming 'tags' is an array
+            'category_ids' => $request->input('category_ids', []), // Assuming 'category_ids' is an array
+        ]);
+
+        // Return a response, you can customize this as needed
+        return response()->json(['message' => 'Article updated successfully']);
+    }
+
+    public function destroy($id)
+    {
+        $article = Article::find($id);
+
+        if (!$article) {
+            return response()->json(['error' => 'Article not found'], 404);
+        }
+
+        // Check if the user has permission to delete the article
+        // You can customize this based on your authentication logic
+        // if ($article->user_id !== Auth::id()) {
+        //     return response()->json(['error' => 'Unauthorized'], 403);
+        // }
+
+        $article->delete();
+
+        return response()->json(['message' => 'Article deleted successfully'], 200);
     }
 }

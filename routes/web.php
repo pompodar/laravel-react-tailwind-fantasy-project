@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Repositories\Contracts\SearchRepository;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\CategoryController;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -35,14 +36,27 @@ require __DIR__.'/auth.php';
 
 Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
 
+// Route::get('/articles', function (SearchRepository $searchRepository) {
+//      return Inertia::render('Articles', [
+//          'articles' => request()->has('q')
+//              ? $searchRepository->search(request('q'))
+//              : App\Models\Article::with('categories')->get(),
+//      ]);
+//  })->name('articles'); 
+
 Route::get('/articles', function (SearchRepository $searchRepository) {
-     return Inertia::render('Articles', [
-         'articles' => request()->has('q')
-             ? $searchRepository->search(request('q'))
-             : App\Models\Article::all(),
+     return Inertia::render('Articles', ['articles' => App\Models\Article::with('categories')->get(),
      ]);
  })->name('articles'); 
 
  Route::get('/articles/add', function (SearchRepository $searchRepository) {
      return Inertia::render('Add_Article');
  })->name('add_article'); 
+
+Route::get('/categories', function () {
+    return Inertia::render('Categories', ['categories' => App\Models\Category::all()]);
+ })->name('categories'); 
+
+ Route::get('/categories/add', function () {
+    return Inertia::render('Add_Category', ['categories' => App\Models\Category::all()]);
+ })->name('add_category');  
