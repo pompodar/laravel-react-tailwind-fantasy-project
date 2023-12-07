@@ -3,8 +3,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { usePage, router, Link } from '@inertiajs/react';
 
-const AddArticle = () => {
+
+const AddArticle = ({auth}) => {
     const [content, setContent] = useState('');
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -56,51 +59,138 @@ const AddArticle = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label>Title:</label>
-            <input
-                type="text"
-                name="title"
-                value={title}
-                onChange={handleTitleChange}
-            />
+        <AuthenticatedLayout user={auth.user}>
+            <div class="content-wrapper">
+                <div class="container-xxl flex-grow-1 container-p-y">
+                    <h4 class="py-1 mb-2">
+                        <span class="text-muted fw-light">
+                            <Link className="mr-2" href={"/articles"}>
+                                Articles
+                            </Link>
+                        /</span>
+                    </h4>
 
-            <label>Content:</label>
-            <ReactQuill name="content" theme="snow" value={content} onChange={setContent} />
+        <div class="row">
+            <div class="col-xl">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center"></div>
+                    <div class="card-body">
+                <form onSubmit={handleSubmit}>
 
-            <input
-                type="text"
-                name="tags"
-                value={tags.join(', ')} // Display tags as a comma-separated string
-                onChange={handleTagsChange}
-            />
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="basic-default-fullname">
+                                                                        Title
+                                                                    </label>
+                                                                    <input
+                                                                        className="form-control rounded"
+                                                                        type="text"
+                                                                        name="title"
+                                                                        placeholder="Title"
+                                                                        value={title}
+                                                                        onChange={handleTitleChange}
+                                                                    />
+                                                                </div>
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="basic-default-company">
+                                                                        Content
+                                                                    </label>
+                                                                    <ReactQuill
+                                                                        className="form-control p-0 rounded"
+                                                                        name="content"
+                                                                        theme="snow"
+                                                                        formats={[
+                                                                            'header',
+                                                                            'bold',
+                                                                            'italic',
+                                                                            'underline',
+                                                                            'strike',
+                                                                            'blockquote',
+                                                                            'list',
+                                                                            'bullet',
+                                                                            'indent',
+                                                                            'link',
+                                                                            'image',
+                                                                            'code-block',
+                                                                            'color',
+                                                                            'background',
+                                                                        ]}
+                                                                        modules={{
+                                                                            //syntax: true,
+                                                                            toolbar: [
+                                                                                'header',
+                                                                                'bold',
+                                                                                'italic',
+                                                                                'list',
+                                                                                'image',
+                                                                                'blockquote',
+                                                                                'underline',
+                                                                                'link',
+                                                                                'code-block',
+                                                                                'list',
+                                                                                { color: ['orangered', 'aqua'] },
+                                                                                { background: ['orangered', 'aqua'] },
+                                                                                'indent',
+                                                                            ],
+                                                                        }}
+                                                                        value={content}
+                                                                        onChange={setContent}
+                                                                    />
+                                                                </div>
 
-            <div>
-                {categories.length > 0 ? (
-                    <>
-                        <label htmlFor="categorySelect">Select a category:</label>
-                        <select
-                            id="categorySelect"
-                            value={selectedCategory}
-                            onChange={handleSelectChange}
-                        >
-                            <option value="" disabled>
-                                Select a category
-                            </option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </>
-                ) : (
-                    <p>No categories found</p>
-                )}
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="basic-default-tags">
+                                                                        Tags
+                                                                    </label>
+                                                                    <input
+                                                                        className="form-control rounded"
+                                                                        type="text"
+                                                                        name="tags"
+                                                                        placeholder="Tags"
+                                                                        value={tags.join(', ')} // Assuming tags is an array
+                                                                        onChange={handleTagsChange}
+                                                                    />
+                                                                </div>
+
+                                                                <div class="mb-3">
+                                                                    <label class="form-label" for="basic-default-categories">
+                                                                        Categories
+                                                                    </label>
+                                                                    <br/>
+                                                                    <select
+                                                                        className="form-control rounded"
+                                                                        name="categories"
+                    value={selectedCategory} // Assuming categories is an array
+                    onChange={handleSelectChange}
+                                                                    >
+                                                                        {categories.map((cat) => (
+                                                                            <option key={cat.id} value={cat.id}>
+                                                                                {cat.name}
+                                                                            </option>
+                                                                        ))}
+                </select>
+                
+
+                                                                    
+                                                                </div>
+
+                                                                <button
+                                                                    className="btn btn-primary mr-2"
+                                                                    type="submit">
+                                                                    Update
+                                                                </button>
+
+                                                                {/* <button className="btn btn-primary" onClick={exit}>
+                                                                    Exit
+                                                                </button> */}
+                        </form>
+                    </div>
+                </div>
             </div>
+        </div>
 
-            <button type="submit">Add Article</button>
-        </form>
+                </div>
+            </div>
+        </AuthenticatedLayout>
     );
 };
 

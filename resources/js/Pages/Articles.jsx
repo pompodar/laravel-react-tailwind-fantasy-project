@@ -210,7 +210,12 @@ const Articles = ({ auth, props, query }) => {
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
                     <h4 class="py-1 mb-2">
-                        <span class="text-muted fw-light">Articles /</span>
+                        <span class="text-muted fw-light">Articles / 
+                            
+                            <Link className="mr-2" href={"/articles/add/"}>
+                                { " " } add
+                            </Link>
+                        </span>
                     </h4>
 
                     {searchQuery && (
