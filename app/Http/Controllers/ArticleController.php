@@ -57,8 +57,9 @@ class ArticleController extends Controller
             'title' => $request->input('title'),
             'body' => $request->input('body'),
             'tags' => $request->input('tags', []), // Assuming 'tags' is an array
-            'category_ids' => $request->input('category_ids', []), // Assuming 'category_ids' is an array
         ]);
+
+        $article->categories()->sync($request->input('categories', []));
 
         // Return a response, you can customize this as needed
         return response()->json(['message' => 'Article updated successfully']);

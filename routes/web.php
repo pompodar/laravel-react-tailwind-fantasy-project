@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use App\Repositories\Contracts\SearchRepository;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CategoryController;
+use App\Models\Article;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -45,9 +46,10 @@ Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
 //  })->name('articles'); 
 
 Route::get('/articles', function (SearchRepository $searchRepository) {
-     return Inertia::render('Articles', ['articles' => App\Models\Article::with('categories')->get(),
-     ]);
- })->name('articles'); 
+    $articles = Article::with('categories')->paginate(5); // Change the number to your desired pagination size
+
+    return Inertia::render('Articles', ['articles' => $articles]);
+})->name('articles');
 
  Route::get('/articles/add', function (SearchRepository $searchRepository) {
      return Inertia::render('Add_Article');
