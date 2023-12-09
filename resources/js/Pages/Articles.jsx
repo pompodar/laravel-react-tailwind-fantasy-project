@@ -37,11 +37,12 @@ const Articles = ({ auth, props, query }) => {
 
             console.log(articles.data);
 
-            for (const key in articles.data) {
+            for (const key in articles) {
+                console.log(articles);
                 hitsArray.push(articles[key]);
             }
 
-            setResults(() => articles.data);
+            articles.data ? setResults(() => articles.data) : setResults(() => articles);
         }
     }, [query, articles]);
 
@@ -205,220 +206,347 @@ const Articles = ({ auth, props, query }) => {
 
     console.log(updatedArticle.categories);
 
+    function generateRandomNumber() {
+        return Math.floor(Math.random() * 35) + 1;
+    } 
+
+    const getParentNames = (category) => {
+        const parentNames = [];
+
+        while (category && category.parent_id) {
+            console.log(category);
+            parentNames.push(category.name);
+            category = category.parent;
+        }
+
+        return parentNames.reverse().join(' / ');
+    };
+
     return (
         <AuthenticatedLayout user={auth.user}>
+
+            <nav
+                class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
+                id="layout-navbar">
+                <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
+                    <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+                        <i class="bx bx-menu bx-sm"></i>
+                    </a>
+                </div>
+
+                <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
+                    <div class="navbar-nav align-items-center">
+                        <div class="nav-item d-flex align-items-center">
+                            <i class="bx bx-search fs-4 lh-0"></i>
+                            <input
+                                type="text"
+                                class="form-control border-0 shadow-none ps-1 ps-sm-2"
+
+                                name="q"
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={handleSearchInput}
+                            />
+
+                        </div>
+                    </div>
+
+                    <ul class="navbar-nav flex-row align-items-center ms-auto">
+                        <li class="nav-item lh-1 me-3">
+                            <a
+                                class="github-button"
+                                href="https://github.com/themeselection/sneat-html-admin-template-free"
+                                data-icon="octicon-star"
+                                data-size="large"
+                                data-show-count="true"
+                                aria-label="Star themeselection/sneat-html-admin-template-free on GitHub"
+                            >Star</a
+                            >
+                        </li>
+
+                        <li class="nav-item navbar-dropdown dropdown-user dropdown">
+                            <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
+                                <div class="avatar avatar-online">
+                                    <img src="/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                </div>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <div class="d-flex">
+                                            <div class="flex-shrink-0 me-3">
+                                                <div class="avatar avatar-online">
+                                                    <img src="/assets/img/avatars/1.png" alt class="w-px-40 h-auto rounded-circle" />
+                                                </div>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <span class="fw-medium d-block">John Doe</span>
+                                                <small class="text-muted">Admin</small>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-divider"></div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bx bx-user me-2"></i>
+                                        <span class="align-middle">My Profile</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <i class="bx bx-cog me-2"></i>
+                                        <span class="align-middle">Settings</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#">
+                                        <span class="d-flex align-items-center align-middle">
+                                            <i class="flex-shrink-0 bx bx-credit-card me-2"></i>
+                                            <span class="flex-grow-1 align-middle ms-1">Billing</span>
+                                            <span class="flex-shrink-0 badge badge-center rounded-pill bg-danger w-px-20 h-px-20">4</span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="dropdown-divider"></div>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0);">
+                                        <i class="bx bx-power-off me-2"></i>
+                                        <span class="align-middle">Log Out</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                
+            </nav>
+
             <div class="content-wrapper">
                 <div class="container-xxl flex-grow-1 container-p-y">
-                    <h4 class="py-1 mb-2">
+
+                    <h4 class="py-1 mb-2 flex">
                         <span class="text-muted fw-light">Articles / 
                             
                             <Link className="mr-2" href={"/articles/add/"}>
                                 { " " } add
                             </Link>
                         </span>
-                    </h4>
 
-                    {searchQuery && (
-                        <p>
-                            Using search: <strong>"{searchQuery}"</strong>.{' '}
-                            <a onClick={clearFilters}>Clear filters</a>
-                        </p>
-                    )}
+                        {searchQuery && (
+                            <span class="text-muted fw-light cursor-pointer ml-auto">
+                                {/* Using search: <strong>"{searchQuery}"</strong>.{' '} */}
+                                <span onClick={clearFilters}>clear filters</span>
+                            </span>
+                        )}
+                    </h4>
 
                     <div>
                         {results.length > 0 ? (
-                            results.map((result) => (
-                                <article key={result.id}>
-                                    {editingArticle === result ? (
-                                        <>
-                                            <div class="row">
-                                                <div class="col-xl">
-                                                    <div class="card mb-4">
-                                                        <div class="card-header d-flex justify-content-between align-items-center"></div>
-                                                        <div class="card-body">
-                                                            <div>
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="basic-default-fullname">
-                                                                        Title
-                                                                    </label>
-                                                                    <input
-                                                                        className="form-control rounded"
-                                                                        type="text"
-                                                                        name="title"
-                                                                        placeholder="Title"
-                                                                        value={updatedArticle.title}
-                                                                        onChange={(e) => handleInputChange(e)}
-                                                                    />
-                                                                </div>
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="basic-default-company">
-                                                                        Content
-                                                                    </label>
-                                                                    <ReactQuill
-                                                                        className="form-control p-0 rounded"
-                                                                        name="content"
-                                                                        theme="snow"
-                                                                        formats={[
-                                                                            'header',
-                                                                            'bold',
-                                                                            'italic',
-                                                                            'underline',
-                                                                            'strike',
-                                                                            'blockquote',
-                                                                            'list',
-                                                                            'bullet',
-                                                                            'indent',
-                                                                            'link',
-                                                                            'image',
-                                                                            'code-block',
-                                                                            'color',
-                                                                            'background',
-                                                                        ]}
-                                                                        modules={{
-                                                                            //syntax: true,
-                                                                            toolbar: [
+                            results.map((result) => {
+                                const imageUrl = `../assets/img/elements/${generateRandomNumber()}.jpg`;
+                                return (
+                                    <article key={result.id}>
+                                        {editingArticle === result ? (
+                                            <>
+                                                <div class="row">
+                                                    <div class="col-xl">
+                                                        <div class="card mb-4">
+                                                            <div class="card-header d-flex justify-content-between align-items-center"></div>
+                                                            <div class="card-body">
+                                                                <div>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label" for="basic-default-fullname">
+                                                                            Title
+                                                                        </label>
+                                                                        <input
+                                                                            className="form-control rounded"
+                                                                            type="text"
+                                                                            name="title"
+                                                                            placeholder="Title"
+                                                                            value={updatedArticle.title}
+                                                                            onChange={(e) => handleInputChange(e)}
+                                                                        />
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label" for="basic-default-company">
+                                                                            Content
+                                                                        </label>
+                                                                        <ReactQuill
+                                                                            className="form-control p-0 rounded"
+                                                                            name="content"
+                                                                            theme="snow"
+                                                                            formats={[
                                                                                 'header',
                                                                                 'bold',
                                                                                 'italic',
-                                                                                'list',
-                                                                                'image',
-                                                                                'blockquote',
                                                                                 'underline',
-                                                                                'link',
-                                                                                'code-block',
+                                                                                'strike',
+                                                                                'blockquote',
                                                                                 'list',
-                                                                                { color: ['orangered', 'aqua'] },
-                                                                                { background: ['orangered', 'aqua'] },
+                                                                                'bullet',
                                                                                 'indent',
-                                                                            ],
-                                                                        }}
-                                                                        value={updatedArticle.body}
-                                                                        onChange={handleChange}
-                                                                    />
-                                                                </div>
+                                                                                'link',
+                                                                                'image',
+                                                                                'code-block',
+                                                                                'color',
+                                                                                'background',
+                                                                            ]}
+                                                                            modules={{
+                                                                                //syntax: true,
+                                                                                toolbar: [
+                                                                                    'header',
+                                                                                    'bold',
+                                                                                    'italic',
+                                                                                    'list',
+                                                                                    'image',
+                                                                                    'blockquote',
+                                                                                    'underline',
+                                                                                    'link',
+                                                                                    'code-block',
+                                                                                    'list',
+                                                                                    { color: ['orangered', 'rgb(113, 221, 55)'] },
+                                                                                    { background: ['orangered', 'rgb(113, 221, 55)'] },
+                                                                                    'indent',
+                                                                                ],
+                                                                            }}
+                                                                            value={updatedArticle.body}
+                                                                            onChange={handleChange}
+                                                                        />
+                                                                    </div>
 
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="basic-default-tags">
-                                                                        Tags
-                                                                    </label>
-                                                                    <input
-                                                                        className="form-control rounded"
-                                                                        type="text"
-                                                                        name="tags"
-                                                                        placeholder="Tags"
-                                                                        value={updatedArticle.tags.join(', ')} // Assuming tags is an array
-                                                                        onChange={(e) => handleInputChange(e)}
-                                                                    />
-                                                                </div>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label" for="basic-default-tags">
+                                                                            Tags
+                                                                        </label>
+                                                                        <input
+                                                                            className="form-control rounded"
+                                                                            type="text"
+                                                                            name="tags"
+                                                                            placeholder="Tags"
+                                                                            value={updatedArticle.tags.join(', ')} // Assuming tags is an array
+                                                                            onChange={(e) => handleInputChange(e)}
+                                                                        />
+                                                                    </div>
 
-                                                                <div class="mb-3">
-                                                                    <label class="form-label" for="basic-default-categories">
-                                                                        Categories
-                                                                    </label>
-                                                                    <br/>
-                                                                    <select
-                                                                        className="form-control rounded"
-                                                                        name="categories"
-                                                                        value={updatedArticle.categories[0] ? updatedArticle.categories[0].id : ""} // Assuming categories is an array
-                                                                        onChange={(e) => handleInputChange(e)}
-                                                                    >
-                                                                        {categories.map((cat) => (
-                                                                            <option key={cat.id} value={cat.id}>
-                                                                                {cat.name}
-                                                                            </option>
-                                                                        ))}
-                                                                    </select>
+                                                                    <div class="mb-3">
+                                                                        <label class="form-label" for="basic-default-categories">
+                                                                            Categories
+                                                                        </label>
+                                                                        <br />
+                                                                        <select
+                                                                            className="form-control rounded"
+                                                                            name="categories"
+                                                                            value={updatedArticle.categories[0] ? updatedArticle.categories[0].id : ""} // Assuming categories is an array
+                                                                            onChange={(e) => handleInputChange(e)}
+                                                                        >
+                                                                            {categories.map((cat) => (
+                                                                                <option key={cat.id} value={cat.id}>
+                                                                                    {cat.name}
+                                                                                </option>
+                                                                            ))}
+                                                                        </select>
 
                                                                     
+                                                                    </div>
+
+                                                                    <button
+                                                                        className="btn btn-primary mr-2"
+                                                                        onClick={() => handleUpdate(result.id)}>
+                                                                        Update
+                                                                    </button>
+
+                                                                    <button className="btn btn-primary" onClick={exit}>
+                                                                        Exit
+                                                                    </button>
                                                                 </div>
-
-                                                                <button
-                                                                    className="btn btn-primary mr-2"
-                                                                    onClick={() => handleUpdate(result.id)}>
-                                                                    Update
-                                                                </button>
-
-                                                                <button className="btn btn-primary" onClick={exit}>
-                                                                    Exit
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div class="col-md">
-                                                <div class="card mb-3">
-                                                    <div class="row g-0">
-                                                        <div class="col-md-8">
-                                                            <div class="card-body">
-                                                                <h2 class="card-title">{result.title}</h2>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div class="col-md">
+                                                    <div class="card mb-3">
+                                                        <div class="row g-0">
+                                                            <div class="col-md-8">
+                                                                <div class="card-body">
+                                                                    <Link className="mr-2 inline-block" href={`/articles/${result.id}/`}>
+                                                                        <h2 class="card-title">{result.title}</h2>
+                                                                    </Link>
+                                                                    <div className="card-text">
+                                                                        <TruncateHTML html={result.body} maxWords={36} />
+                                                                    </div>
+                                                                        {result.tags && (
+                                                                            <div className="mt-3">
+                                                                                {result.tags &&
+                                                                                    result.tags.map((tag) => (
+                                                                                        <span
+                                                                                            key={tag}
+                                                                                            className="text-xs px-2 py-1 rounded bg-indigo-50 text-indigo-500">
+                                                                                            {tag}
+                                                                                        </span>
+                                                                                    ))}
+                                                                            </div>
+                                                                        )
+                                                                        }
+                                                                        {result.categories && (
+                                                                            <ul className="mt-2">
+                                                                                {result.categories.map((category) => (
+                                                                                    <li key={category.id}>
+                                                                                        <span className="text-xs mt-4 px-2 py-1 rounded bg-indigo-50 text-indigo-500">
+                                                                                            {/* {category.parent && category.parent.name + " / "}{category.name} */}
+                     
+                                                                                            {getParentNames(category)}
+                                                                                        </span>
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        )}
 
-                                                                <div className="card-text">
-                                                                    <TruncateHTML html={result.body} maxWords={30} />
+                                                                    {/* <button
+                                                                        className="mr-2 mt-2"
+                                                                        onClick={() => handleEdit(result)}>
+                                                                        <i
+                                                                            style={{ color: '#71dd37' }}
+                                                                            class="bx bx-edit-alt me-1"></i>
+                                                                        <small>edit</small>
+                                                                    </button> */}
+                                                                    {/* <button
+                                                                        className="mr-2 mt-2"
+                                                                        onClick={() => handleDelete(result.id)}>
+                                                                        <i class="bx bx-trash me-1 text-danger"></i>
+                                                                        <small>delete</small>
+                                                                    </button> */}
                                                                 </div>
-
-                                                                <div className="mt-3">
-                                                                    {result.tags &&
-                                                                        result.tags.map((tag) => (
-                                                                            <span
-                                                                                key={tag}
-                                                                                className="text-xs px-2 py-1 rounded bg-indigo-50 text-indigo-500">
-                                                                                {tag}
-                                                                            </span>
-                                                                        ))}
-                                                                </div>
-                                                                <ul className="mt-2">
-                                                                    {result.categories &&
-                                                                        result.categories.map((category) => (
-                                                                            <li>
-                                                                                <span
-                                                                                    className="text-xs mt-4 px-2 py-1 rounded bg-indigo-50 text-indigo-500"
-                                                                                    key={category.id}>
-                                                                                    {category.name}
-                                                                                </span>
-                                                                            </li>
-                                                                        ))}
-                                                                </ul>
-                                                                <button
-                                                                    className="mr-2 mt-2"
-                                                                    onClick={() => handleEdit(result)}>
-                                                                    <i
-                                                                        style={{ color: '#71dd37' }}
-                                                                        class="bx bx-edit-alt me-1"></i>
-                                                                    <small>edit</small>
-                                                                </button>
-                                                                <button
-                                                                    className="mr-2 mt-2"
-                                                                    onClick={() => handleDelete(result.id)}>
-                                                                    <i class="bx bx-trash me-1 text-danger"></i>
-                                                                    <small>delete</small>
-                                                                </button>
                                                             </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <img
-                                                                class="card-img card-img-right"
-                                                                src="../assets/img/elements/17.jpg"
-                                                                alt="Card image"
-                                                            />
+                                                            <div class="col-md-4">
+                                                                <img
+                                                                    class="card-img card-img-right"
+                                                                    src={imageUrl}
+                                                                    alt="Card image"
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        </>
-                                    )}
-                                </article>
-                            ))
+                                            </>
+                                        )}
+                                    </article>
+                                )
+                            })
                         ) : (
                             <p>No articles found</p>
                         )}
                     </div>
 
                     {/* Display pagination links */}
-                    <div>
+                    <div className="pagination">
                         {articles.prev_page_url && (
                             <Link className="mr-2" href={articles.prev_page_url}>
                                 Previous

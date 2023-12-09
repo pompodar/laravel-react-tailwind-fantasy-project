@@ -2,11 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { router } from '@inertiajs/react'
 
 const Categories = (props) => {
+    // const { categories } = props;
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [categories, setCategories] = useState([]);
 
     const [editingCategoryId, setEditingCategoryId] = useState(null);
     const [editedCategoryName, setEditedCategoryName] = useState('');
 
+    const handleSelectChange = (event) => {
+        setSelectedCategory(event.target.value);
+    };
 
     useEffect(() => {
         fetchCategories();
@@ -39,9 +44,11 @@ const Categories = (props) => {
     };
 
     const handleUpdate = async () => {
+        console.log(selectedCategory);
         try {
             await axios.put(`/api/categories/${editingCategoryId}`, {
                 name: editedCategoryName,
+                parent_id: selectedCategory,
             });
 
             // After updating, fetch the updated list of categories
@@ -73,6 +80,29 @@ const Categories = (props) => {
                                     value={editedCategoryName}
                                     onChange={(e) => setEditedCategoryName(e.target.value)}
                                 />
+                                <div>
+                                    {categories.length > 0 ? (
+                                        <>
+                                            <label htmlFor="categorySelect">Select a category:</label>
+                                            <select
+                                                id="categorySelect"
+                                                value={selectedCategory}
+                                                onChange={handleSelectChange}
+                                            >
+                                                <option value="" disabled>
+                                                    Select a category
+                                                </option>
+                                                {categories.map((category) => (
+                                                    <option key={category.id} value={category.id}>
+                                                        {category.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </>
+                                    ) : (
+                                        <p>No categories found</p>
+                                    )}
+                                </div>
                                 <button onClick={handleUpdate}>Update</button>
                             </>
                         ) : (

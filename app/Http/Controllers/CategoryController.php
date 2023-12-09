@@ -71,9 +71,17 @@ class CategoryController extends Controller
 
         $category->update([
             'name' => $request->input('name'),
+            'parent_id' => $request->input('parent_id'),
         ]);
 
         return response()->json(['category' => $category], 200);
+    }
+
+    public function menu()
+    {
+        $categories = Category::with('findChildren')->whereNull('parent_id')->get();
+        
+        return response()->json(['categories' => $categories]);
     }
 
 }

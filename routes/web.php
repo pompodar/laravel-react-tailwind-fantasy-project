@@ -9,6 +9,7 @@ use App\Repositories\Contracts\SearchRepository;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CategoryController;
 use App\Models\Article;
+use App\Models\Category;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -37,23 +38,47 @@ require __DIR__.'/auth.php';
 
 Route::delete('/users/{userId}', [UserController::class, 'deleteUser']);
 
-// Route::get('/articles', function (SearchRepository $searchRepository) {
-//      return Inertia::render('Articles', [
-//          'articles' => request()->has('q')
-//              ? $searchRepository->search(request('q'))
-//              : App\Models\Article::with('categories')->get(),
-//      ]);
-//  })->name('articles'); 
-
 Route::get('/articles', function (SearchRepository $searchRepository) {
-    $articles = Article::with('categories')->paginate(5); // Change the number to your desired pagination size
+    $articles = request()->has('q')
+        ? $searchRepository->search(request('q'))
+        : Article::with('categories')->paginate(5);
 
-    return Inertia::render('Articles', ['articles' => $articles]);
+    foreach ($articles as $article) {
+        foreach ($article->categories as $category) {
+            
+            $parents = $category->findParents();
+            // $parents now contains an array of parent categories
+        }
+    }
+
+    return Inertia::render('Articles', [
+        'articles' => $articles,
+    ]);
 })->name('articles');
+
+// Route::get('/cats', function (SearchRepository $searchRepository) {
+//     $categories = Category::with('findChildren')->whereNull('parent_id')->get();
+
+//     return Inertia::render('Cats', [
+//         'cats' => $categories,
+//     ]);
+// })->name('cats');
+
+// Route::get('/articles', function (SearchRepository $searchRepository) {
+//     $articles = Article::with('categories')->paginate(5); // Change the number to your desired pagination size
+
+//     return Inertia::render('Articles', ['articles' => $articles]);
+// })->name('articles');
 
  Route::get('/articles/add', function (SearchRepository $searchRepository) {
      return Inertia::render('Add_Article');
  })->name('add_article'); 
+ 
+Route::get('/articles/{id}', function (SearchRepository $searchRepository, $id) {
+    $article = Article::with('categories')->find($id);
+
+    return Inertia::render('Article', ['article' => $article]);
+})->name('articles');
 
 Route::get('/categories', function () {
     return Inertia::render('Categories', ['categories' => App\Models\Category::all()]);

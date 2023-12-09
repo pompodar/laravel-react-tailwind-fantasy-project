@@ -47,11 +47,26 @@ const AddArticle = ({auth}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log(tags);
-
         try {
-            await axios.post('/api/articles/create', { title: title, content: content, tags: tags, selectedCategory: selectedCategory });
-            // Handle success (redirect, display a message, etc.)
+            const response = await axios.post('/api/articles/create', {
+                title: title,
+                content: content,
+                tags: tags,
+                selectedCategory: selectedCategory
+            });
+
+            // Access the response data
+            router.visit('/articles/' + response.data.article.id + "/", {
+                method: 'get',
+                preserveState: true,
+                onCancel: () => { },
+                onSuccess: (page) => {
+                },
+                onError: (errors) => {
+                    console.log(errors);
+                },
+            });
+
         } catch (error) {
             // Handle error
             console.error('Error creating article:', error);
@@ -70,7 +85,7 @@ const AddArticle = ({auth}) => {
                         /</span>
                     </h4>
 
-        <div class="row">
+        <div class="row add-article">
             <div class="col-xl">
                 <div class="card mb-4">
                     <div class="card-header d-flex justify-content-between align-items-center"></div>
@@ -176,7 +191,7 @@ const AddArticle = ({auth}) => {
                                                                 <button
                                                                     className="btn btn-primary mr-2"
                                                                     type="submit">
-                                                                    Update
+                                                                    Add
                                                                 </button>
 
                                                                 {/* <button className="btn btn-primary" onClick={exit}>
