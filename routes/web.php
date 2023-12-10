@@ -87,3 +87,9 @@ Route::get('/categories', function () {
  Route::get('/categories/add', function () {
     return Inertia::render('Add_Category', ['categories' => App\Models\Category::all()]);
  })->name('add_category');  
+
+Route::get('/{name}', function ($name) {
+    $articles = [Category::where('name', $name)->first()->articles];
+
+    return Inertia::render('Articles', ['articles' => $articles]);
+})->name('category-articles');

@@ -4,12 +4,17 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import axios from 'axios';
-import { Link } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 
 export default function Authenticated({ user, header, children }) {
-    const [openCategories, setOpenCategories] = useState([]);
+    const initialOpenCategories = JSON.parse(localStorage.getItem('openCategories')) || [];
+
+    const [openCategories, setOpenCategories] = useState(initialOpenCategories);
+
 
     const [categories, setCategoriess] = useState([]);
+
+    const [level, setLevel] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,28 +25,48 @@ export default function Authenticated({ user, header, children }) {
         fetchData();
     }, []);
 
-    const toggleAccordion = (categoryId) => {
-        console.log("shi");
-        if (openCategories.includes(categoryId)) {
-            setOpenCategories(openCategories.filter((id) => id !== categoryId));
+    const toggleAccordion = (category) => {
+       
+        if (openCategories.includes(category.id)) {
+            setOpenCategories(openCategories.filter((id) => id !== category.id));
         } else {
-            setOpenCategories([...openCategories, categoryId]);
+            
+            setOpenCategories([...openCategories, category.id]);
+
+            
+            
         }
+        router.visit('/' + category.name.toLowerCase(), {
+                method: 'get',
+                preserveState: true,
+                onCancel: () => { },
+                onSuccess: (page) => {
+
+                },
+                onError: (errors) => {
+                    console.log(errors);
+                },
+                onFinish: visit => {
+
+                },
+            });
     };
+
+    useEffect(() => {
+        localStorage.setItem('openCategories', JSON.stringify(openCategories));
+    }, [openCategories]);
 
     const isOpen = (categoryId) => openCategories.includes(categoryId);
-    const renderCategories = (categories) => {
+    const renderCategories = (categories, currentLevel) => {
         return categories.map((category) => (
-            <li className="menu-item cursor-pointer" key={category.id}>
-                <div className="menu-link accordion-header" onClick={() => toggleAccordion(category.id)}>
+            <li style={{marginLeft: currentLevel * 5 }} className={`level-${currentLevel} menu-item cursor-pointer`} key={category.id}>
+                <div className="menu-link accordion-header" onClick={() => toggleAccordion({ id: category.id, name: category.name })}>
                     {category.name}
                 </div>
-                {isOpen(category.id) && category.find_children && renderCategories(category.find_children)}
+                {isOpen(category.id) && category.find_children && renderCategories(category.find_children, currentLevel + 1)}
             </li>
         ));
-    };
-
-    
+    };    
 
     function generateRandomNumber() {
         return Math.floor(Math.random() * 13) + 1;
@@ -62,7 +87,7 @@ export default function Authenticated({ user, header, children }) {
                                     <img src={imageUrl} alt class="w-px-40 h-auto rounded-circle" />
 
                                 </span>
-                                <span class="app-brand-text demo menu-text fw-bold ms-2">Write</span>
+                                <p class="app-brand-text demo menu-text fw-bold ms-2">Write<span style={{ color: "rgb(113, 221, 55)", fontSize: "3rem"}}>R</span></p>
                             </a>
 
                             <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -74,24 +99,13 @@ export default function Authenticated({ user, header, children }) {
 
                         <ul class="menu-inner py-1">
                             <li class="menu-item active open">
-                                <a href="javascript:void(0);" class="menu-link menu-toggle">
+                                <Link href="/articles" class="menu-link menu-toggle">
                                     <i class="menu-icon tf-icons bx bx-home-circle"></i>
-                                    <div data-i18n="Dashboards">Dashboards</div>
+                                    <div data-i18n="Dashboards">All</div>
                                     <div class="badge bg-danger rounded-pill ms-auto">5</div>
-                                </a>
+                                </Link>
                                 <ul class="menu-sub">
-                                    {renderCategories(categories)}
-
-                                    <li class="menu-item">
-                                        <Link
-                                            href="/articles"
-                                            target="_blank"
-                                            class="menu-link">
-                                            <div data-i18n="Articles">All</div>
-                                        </Link>
-                
-                                    </li>
-                                    
+                                    {renderCategories(categories, level + 1)}                                    
                                     
                                 </ul>
                             </li>

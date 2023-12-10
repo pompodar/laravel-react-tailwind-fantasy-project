@@ -145,7 +145,7 @@ const Articles = ({ auth, props, query }) => {
     console.log(updatedArticle.categories);
 
     function generateRandomNumber() {
-        return Math.floor(Math.random() * 35) + 1;
+        return Math.floor(Math.random() * 63) + 1;
     }
 
     const imageUrl = `/assets/img/elements/${generateRandomNumber()}.jpg`;

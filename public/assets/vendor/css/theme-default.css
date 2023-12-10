@@ -783,7 +783,7 @@ html:not(.layout-menu-collapsed) .bg-menu-theme .menu-inner .menu-item .menu-lin
   background: #696cff;
 }
 .bg-menu-theme .menu-sub .menu-item .menu-link:before {
-  background-color: #b4bdc6 !important;
+  background-color: rgb(113, 221, 55) !important;
 }
 .bg-menu-theme .menu-sub > .menu-item.active > .menu-link:not(.menu-toggle):before {
   background-color: #696cff !important;
@@ -829,4 +829,8 @@ html:not(.layout-menu-collapsed) .bg-menu-theme .menu-inner .menu-item .menu-lin
 
 .layout-footer-fixed .content-footer {
   box-shadow: 0 0 0.375rem 0.25rem rgba(161, 172, 184, 0.15);
+}
+
+.w-px-40 {
+  width: 50px !important;
 }

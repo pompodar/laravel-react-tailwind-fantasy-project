@@ -11,6 +11,8 @@ const Articles = ({ auth, props, query }) => {
     const [results, setResults] = useState([]);
     const [categories, setCategories] = useState([]);
 
+    console.log(articles);
+
     const [editingArticle, setEditingArticle] = useState(null);
     const [updatedArticle, setUpdatedArticle] = useState({
         title: '',
@@ -42,7 +44,11 @@ const Articles = ({ auth, props, query }) => {
                 hitsArray.push(articles[key]);
             }
 
-            articles.data ? setResults(() => articles.data) : setResults(() => articles);
+            if (searchQuery) {
+                setResults(() => articles);
+            } else {
+                articles.data ? setResults(() => articles.data) : setResults(() => articles[0]);
+            }
         }
     }, [query, articles]);
 
@@ -207,7 +213,8 @@ const Articles = ({ auth, props, query }) => {
     console.log(updatedArticle.categories);
 
     function generateRandomNumber() {
-        return Math.floor(Math.random() * 35) + 1;
+        return Math.floor(Math.random() * 63
+        ) + 1;
     } 
 
     const getParentNames = (category) => {
@@ -330,10 +337,11 @@ const Articles = ({ auth, props, query }) => {
                 <div class="container-xxl flex-grow-1 container-p-y">
 
                     <h4 class="py-1 mb-2 flex">
-                        <span class="text-muted fw-light">Articles / 
-                            
+                        <span class="text-muted fw-light">Articles  / 
                             <Link className="mr-2" href={"/articles/add/"}>
-                                { " " } add
+                                {""}<i
+                                    style={{ color: '#71dd37', fontSize: 14 }}
+                                    class="bx bx-edit-alt me-1"></i>add
                             </Link>
                         </span>
 
