@@ -221,12 +221,28 @@ const Articles = ({ auth, props, query }) => {
         const parentNames = [];
 
         while (category && category.parent_id) {
-            console.log(category);
-            parentNames.push(category.name);
-            category = category.parent;
+            parentNames.push(
+                <Link key={category.id} href={category.name.toLowerCase()}>
+                    {category.name}
+                </Link>
+            );
+            
+            if (category.parent_id) {
+                category = category.parent;
+            } else {
+                break;
+            }
+
+            console.log(parentNames);
         }
 
-        return parentNames.reverse().join(' / ');
+        // return parentNames.reverse().join(' / ');
+        return parentNames.reverse().map((element, index) => (
+            <React.Fragment key={index}>
+                {index > 0 && ' / '}
+                {element}
+            </React.Fragment>
+        ));
     };
 
     return (
